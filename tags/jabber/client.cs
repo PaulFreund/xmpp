@@ -37,6 +37,7 @@ namespace XMPP.tags.jabber.client
         public static XName subject = XName.Get("subject", Name);
         public static XName thread = XName.Get("thread", Name);
         public static XName error = XName.Get("error", Name);
+	public static XName received = XName.Get("received", Name);
     }
 
     [XMPPTag(typeof(Namespace), typeof(message))]
@@ -219,6 +220,39 @@ namespace XMPP.tags.jabber.client
 
         // Has children
     }
+    
+	
+	
+	
+    [XMPPTag(typeof(Namespace), typeof(received))]
+    public class received : Tag
+    {
+        public received() : base(Namespace.received) { }
+        public received(XElement other) : base(other) { id = NextId(); }
+
+        public enum typeEnum
+        {
+            none,
+            
+        }
+
+        public string from { get { return (string)GetAttributeValue("from"); } set { SetAttributeValue("from", value); } }
+        public string to { get { return (string)GetAttributeValue("to"); } set { SetAttributeValue("to", value); } }
+        public typeEnum type { get { return GetAttributeEnum<typeEnum>("type"); } set { SetAttributeEnum<typeEnum>("type", value); } }
+        public string id { get { return (string)GetAttributeValue("id"); } set { SetAttributeValue("id", value); } }
+        public string lang { get { return (string)GetAttributeValue(XName.Get("lang", xml.Namespace.Name)); } set { SetAttributeValue(XName.Get("lang", xml.Namespace.Name), value); } }
+        public string xmlns { get { return (string)GetAttributeValue(XName.Get("xmlns", xml.Namespace.Name)); } set { SetAttributeValue(XName.Get("xmlns", xml.Namespace.Name), value); } }
+
+        public IEnumerable<body> bodyElements { get { return Elements<body>(Namespace.body); } }
+        public IEnumerable<subject> subjectElements { get { return Elements<subject>(Namespace.subject); } }
+        public IEnumerable<thread> threadElements { get { return Elements<thread>(Namespace.thread); } }
+        public IEnumerable<error> errorElements { get { return Elements<error>(Namespace.error); } }
+
+        public string body { get { return string.Join(" ", (from body in bodyElements select body.Value)); } }
+    }
+
+
+
 }
 
 /*
@@ -435,6 +469,39 @@ namespace XMPP.tags.jabber.client
       </xs:attribute>
     </xs:complexType>
   </xs:element>
+</xs:schema>
+
+<xs:schema
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'
+    targetNamespace='urn:xmpp:receipts'
+    xmlns='urn:xmpp:receipts'
+    elementFormDefault='qualified'>
+
+  <xs:annotation>
+    <xs:documentation>
+      The protocol documented by this schema is defined in
+      XEP-0184: http://xmpp.org/extensions/xep-0184.html
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name='received'>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base='empty'>
+          <xs:attribute name='id' type='xs:string' use='optional'/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='request' type='empty'/>
+
+  <xs:simpleType name='empty'>
+    <xs:restriction base='xs:string'>
+      <xs:enumeration value=''/>
+    </xs:restriction>
+  </xs:simpleType>
 
 </xs:schema>
+
 */
